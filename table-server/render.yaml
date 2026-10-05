@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: stillwater-private-tables
+    runtime: node
+    plan: free
+    buildCommand: node --version
+    startCommand: node table-server/server.cjs

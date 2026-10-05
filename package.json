@@ -1,0 +1,8 @@
+{
+  "name": "stillwater-private-tables",
+  "version": "0.14.0",
+  "private": true,
+  "description": "Private fictional-coin blackjack tables for Range Lens",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node table-server/server.cjs" }
+}
