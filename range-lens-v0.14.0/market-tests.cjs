@@ -1,0 +1,6 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');const M=require('./market-sync');
+for(const [s,b,q] of [['ADA/USDT','ADA','USDT'],['KEC_USDT','KEC','USDT'],['BTCUSDT','BTC','USDT'],['PEPE / USD','PEPE','USD']])assert.deepEqual(M.parse(s),{base:b,quote:q,key:b+'/'+q});
+assert.equal(M.parse('XRP'),null);assert.equal(M.parse('Price XRPUSDT 5m'),null);
+let listener;const ctx={Date,Map,Promise,AbortSignal,console,chrome:{action:{onClicked:{addListener(){}}},runtime:{onMessage:{addListener(f){listener=f}}}},fetch:async()=>({ok:true,json:async()=>({error:[],result:{ADA:{altname:'ADAUSD',wsname:'ADA/USD',status:'online'},BTC:{altname:'XBTUSD',wsname:'XBT/USD',status:'online'}}})})};vm.runInNewContext(fs.readFileSync(__dirname+'/background.js','utf8'),ctx);
+const request=(base,quote='USDT')=>new Promise(r=>listener({type:'RANGE_LENS_RESOLVE',base,quote},{tab:{id:1}},r));
+(async()=>{assert.equal((await request('ADA')).pair,'ADAUSD');assert.equal((await request('BTC')).pair,'XBTUSD');assert.match((await request('KEC')).error,/Unsupported/);assert.match((await request('ADA','EUR')).error,/Unsupported/);console.log('PASS: market parsing, dynamic catalog, explicit BTC alias, unsupported coin and quote rejected')})().catch(e=>{console.error(e);process.exit(1)});

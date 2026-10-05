@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Range Lens — Markets & Stillwater",
+  "version": "0.14.0",
+  "description": "Compact chart-timeframe range analysis, plus a quiet fishing game with locally saved progress.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://api.kraken.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Toggle Range Lens"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "stillwater.html",
+        "stillwater.css",
+        "stillwater.js",
+        "stillwater-core.js",
+        "casino.html",
+        "casino.css",
+        "casino.js",
+        "blackjack-core.js",
+        "online.html",
+        "online.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ]
+}

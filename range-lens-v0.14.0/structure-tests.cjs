@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');const E=require('./engine');
+const bar=(i,o,h,l,c)=>({t:1700000000+i*900,o,h,l,c,v:1});
+const bull=[bar(0,10,11,9,10),bar(1,10,14,10,13),bar(2,13,15,13,14)];
+let gaps=E.detectFVGs(bull);assert.equal(gaps.length,1);assert.equal(gaps[0].status,'untouched');assert.equal(gaps[0].lo,11);assert.equal(gaps[0].hi,13);
+const partial=[...bull,bar(3,14,14,12,13)];let g=E.detectFVGs(partial)[0];assert.equal(g.status,'partial');assert.equal(g.remainingHi,12);
+const filled=[...partial,bar(4,12,13,10.5,12)];g=E.detectFVGs(filled)[0];assert.equal(g.status,'filled');assert.equal(g.invalidatedAt,null);
+g=E.detectFVGs([...filled,bar(5,11,12,9,10)])[0];assert(g.invalidatedAt);
+const bear=bull.map(c=>({...c,o:40-c.o,h:40-c.l,l:40-c.h,c:40-c.c}));assert.equal(E.detectFVGs(bear)[0].side,'bearish');
+const hole=bull.map(c=>({...c}));hole[2].t+=900;assert.equal(E.detectFVGs(hole).length,0);
+const range=E.fixture(),a=E.analyze(range,1.5);assert(a.activeRange);assert.equal(a.floor,a.activeRange.floor);assert.equal(a.ceiling,a.activeRange.ceiling);assert(a.history.length);
+const prefix=E.analyze(range.slice(0,60),1.5);assert.equal(a.history[0].floor,prefix.history[0].floor);assert.equal(a.history[0].establishedAt,prefix.history[0].establishedAt);
+const broken=[...range,...Array.from({length:3},(_,i)=>({...range.at(-1),t:range.at(-1).t+(i+1)*900,o:1.54,h:1.55,l:1.535,c:1.54}))];const b=E.analyze(broken,1.54);assert.equal(b.valid,false);assert.equal(b.history[0].breakDirection,'up');assert.equal(b.history[0].floor,a.floor);
+const retest=[...broken,{...broken.at(-1),t:broken.at(-1).t+900,o:1.535,h:1.54,l:a.ceiling,c:a.ceiling+.001}];assert(E.analyze(retest,1.53).history[0].retestHeld);
+const tr=E.fixture('trend');assert.equal(E.analyze(tr,tr.at(-1).c).floor,null);assert.equal(E.analyze(tr,tr.at(-1).c).valid,false);
+console.log('PASS: FVG creation/partial/fill/invalidation, bearish gaps, missing-bar rejection, causal pinned ranges, break/retest and no invented trending range');

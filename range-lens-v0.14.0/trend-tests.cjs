@@ -1,0 +1,5 @@
+const assert=require('node:assert/strict');const {trend,fixture,combineTrends,alignment}=require('./engine');
+const up=fixture('trend');const down=up.map(c=>({...c,o:3-c.o,h:3-c.l,l:3-c.h,c:3-c.c}));const flat=up.map(c=>({...c,o:1.5,h:1.502,l:1.498,c:1.5}));
+assert.equal(trend(up).direction,'RISING');assert.equal(trend(down).direction,'FALLING');assert.equal(trend(flat).direction,'SIDEWAYS');assert.throws(()=>trend(up.slice(0,50)));assert.throws(()=>trend([...up].reverse()));
+const rising=trend(up),falling=trend(down);assert.equal(combineTrends(rising,rising).direction,'RISING');assert.equal(combineTrends(rising,falling).direction,'MIXED');assert.equal(combineTrends(null,rising).direction,'UNAVAILABLE');assert.match(alignment(falling,rising),/broader uptrend/);assert.match(alignment(rising,falling),/broader downtrend/);assert.match(alignment(rising,rising),/not a short signal/);
+console.log('PASS: rising/falling/flat trends, conflicting timeframes, missing feeds and pullback context');

@@ -1,0 +1,3 @@
+const assert=require('node:assert/strict'),{analyze,fixture,setups}=require('./engine');const bars=fixture(),a=analyze(bars,1.5),flat={direction:'SIDEWAYS'},up={direction:'RISING'},down={direction:'FALLING'};
+let s=setups(a,flat,flat);assert.equal(s.length,2);assert(s[0].invalidation<s[0].lo&&s[0].target>s[0].hi);assert(s[1].invalidation>s[1].hi&&s[1].target<s[1].lo);assert.equal(setups(a,down,flat)[0].status,'Wait');assert.equal(setups(a,up,flat)[1].status,'Wait');assert(setups(a,null,flat).every(s=>s.status==='Wait'));assert(setups({...a,valid:false},flat,flat).every(s=>s.status==='Wait'));assert(s.every(s=>Number.isFinite(s.rr)));
+console.log('PASS: conditional setup levels, opposing-trend veto, missing-feed/range veto and finite reward/risk');

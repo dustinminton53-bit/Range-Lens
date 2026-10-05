@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');const {takeProfits}=require('./engine');
+const a={atr:1,price:102,history:[{floor:100,ceiling:120,establishedAt:1}],levels:[{price:111,count:3,points:[{confirmedAt:2}]}],fvgs:[{side:'bearish',status:'untouched',remainingLo:115,remainingHi:117,formedAt:3}]};
+let r=takeProfits(a,101,'long');assert.deepEqual(r.targets.map(t=>t.price),[111,115,120]);assert(r.targets[0].label.includes('swing'));assert(r.targets[1].label.includes('FVG'));assert(r.targets[2].label.includes('ceiling'));
+r=takeProfits({...a,price:119},119,'short');assert.deepEqual(r.targets.map(t=>t.price),[117,111,100]);assert(r.targets.every(t=>t.percent>0));
+assert.equal(takeProfits({...a,history:[],levels:[],fvgs:[]},101,'long').targets.length,0);
+assert.equal(takeProfits(null,101,'long').targets.length,0);assert.equal(takeProfits(a,NaN,'long').targets.length,0);
+assert(!takeProfits({...a,fvgs:[{...a.fvgs[0],status:'filled'}]},101,'long').targets.some(t=>t.label.includes('FVG')));
+assert(!takeProfits({...a,fvgs:[{...a.fvgs[0],invalidatedAt:4}]},101,'long').targets.some(t=>t.label.includes('FVG')));
+assert(takeProfits({...a,price:116},101,'long').targets.every(t=>t.price>116));
+console.log('PASS: structure-sourced targets, directional ordering, filled/invalidated exclusion, no fractional fallback');

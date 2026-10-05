@@ -1,0 +1,3 @@
+const assert=require('node:assert/strict'),B=require('./blackjack-core');
+assert.deepEqual(B.chipValues(0),[2,4,6,10]);assert.deepEqual(B.chipValues(6),[2,4,6,10]);assert.deepEqual(B.chipValues(100),[2,10,20,50]);assert.deepEqual(B.chipValues(1000),[2,100,200,500]);assert.deepEqual(B.chipValues(10000),[2,1000,2000,5000]);assert.deepEqual(B.chipValues(1e8),[2,10000000,20000000,50000000]);for(const balance of [0,1,2,5,8,99,101,249,999,1e8,NaN,-1]){const chips=B.chipValues(balance);assert.equal(chips.length,4);assert.equal(new Set(chips).size,4);assert(chips.every((c,i)=>Number.isSafeInteger(c)&&c>=2&&c%2===0&&(!i||c>chips[i-1])))}
+console.log('PASS: wallet scaling, low balances, distinct even denominations, large balances, invalid balances');
